@@ -165,19 +165,21 @@ def parse_bookplan(path, folder_day):
     return out
 
 # ---------------- accommodations ----------------
-A_MAP = {"Reservation ID": "reservation_id", "Book Date": "book_date", "Full Name": "guest",
+# NOTE: "Full Name" and "Email" are deliberately NOT mapped. This database is
+# published to a public repository; guest identities must never enter it.
+A_MAP = {"Reservation ID": "reservation_id", "Book Date": "book_date",
          "Room": "room", "Room Type": "room_type", "Check-in": "check_in", "Check-out": "check_out",
          "Nights": "nights", "Adults": "adults", "Children": "children", "Infants": "infants",
          "Rate": "rate_plan", "Total": "total", "Room Total": "room_total", "Board": "board",
-         "Balance": "balance", "Email": "email", "Source": "source", "Commission": "commission",
+         "Balance": "balance", "Source": "source", "Commission": "commission",
          "Status": "status", "Country": "country", "Property ID": "property_id"}
 NUMF = {"nights", "adults", "children", "infants", "total", "room_total", "balance", "commission"}
 DATEF = {"book_date", "check_in", "check_out"}
 
 
-B_MAP = {"Reservation ID": "reservation_id", "Book Date": "book_date", "Client": "guest",
+B_MAP = {"Reservation ID": "reservation_id", "Book Date": "book_date",
          "From": "check_in", "To": "check_out", "Total": "total", "Rooms Total": "room_total",
-         "Balance": "balance", "Status": "status", "Email": "email", "Source": "source",
+         "Balance": "balance", "Status": "status", "Source": "source",
          "Extras total": "extras_total", "Fees total": "fees_total", "Products total": "products_total",
          "F&B total": "fb_total", "Other total": "other_total", "Segment": "segment"}
 B_NUM = {"total", "room_total", "balance", "extras_total", "fees_total", "products_total", "fb_total", "other_total"}

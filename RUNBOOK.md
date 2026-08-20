@@ -25,14 +25,34 @@ are genuinely "yesterday's bookings" feed the production charts.
 
 ---
 
+## Where this runs
+
+The repo is `Eyaliko/ac-8f3d92b1`. **It must be attached to the session** — the git
+proxy only injects credentials for repositories in the session's authorized set, so
+a session without it can read the repo but `git push` fails with 403.
+
+GitHub Pages serves the **`main` branch from `/` (root)**, so the live site at
+<https://eyaliko.github.io/ac-8f3d92b1/> is simply whatever `index.html` sits at the
+repo root. Publishing = committing that file.
+
 ## Steps
 
 ### 1. Clone
 
 ```bash
-git clone --depth 50 https://github.com/<OWNER>/<REPO>.git /home/claude/hotel
+git clone --depth 50 https://github.com/Eyaliko/ac-8f3d92b1.git /home/claude/hotel
 cd /home/claude/hotel
 ```
+
+Confirm push access before doing any work — better to fail here than after
+downloading a day's email:
+
+```bash
+git push --dry-run origin main
+```
+
+If that returns `access denied by the git proxy`, stop and tell the user the
+repository is not attached to this session.
 
 ### 2. Find any emails not yet in the manifest
 
@@ -96,12 +116,15 @@ python3 tools/render.py       # -> build/index.html (self-contained)
 Sanity-check the printed summary: the daily row count should have grown by
 roughly the number of new days, and `latest snapshot` should be today.
 
-Commit the database to `main`, then force-push the built page as a single commit
-on `gh-pages` so the site branch never accumulates history:
+Then publish — this copies `build/index.html` to the repo root and pushes:
 
 ```bash
 bash tools/publish.sh
 ```
+
+The live site updates a minute or two later. If the script says *"nothing to
+publish"*, the rebuild produced no change, which usually means step 2 found no new
+email — do not force it.
 
 ### 6. Report
 
@@ -121,8 +144,23 @@ what happened and what is now stale.
   the dashboard can warn about it.
 - **2025 comes from the prior-year columns** of the 2026 reports, which is why
   history reaches back to 1 Jan 2025 even though the oldest email is Sept 2025.
-- **Never commit guest names, emails or phone numbers to the published page.**
-  `build_db.py` deliberately drops them; `db/reservations.jsonl` keeps them in
-  the repo only.
 - The full backfill (355 emails) took six parallel subagents about four minutes.
   Only do that again if the stores are lost — normally one day is one email.
+- **No guest identities, anywhere in this repo.** The repository is public, so
+  `tools/parse.py` no longer maps the spreadsheets' "Full Name"/"Client" and
+  "Email" columns at all — they are never written to `db/reservations.jsonl`.
+  `tools/publish.sh` refuses to push if a `guest` or `email` field turns up in the
+  database, or if anything resembling a guest email address appears in the page.
+  If you ever change the parser, keep both guards.
+- **History growth.** `index.html` is ~1.2 MB and is rewritten every day, so the
+  repo grows about half a gigabyte a year. `publish.sh` warns past 500 MB. To
+  squash when that happens:
+
+  ```bash
+  git checkout --orphan squashed && git add -A
+  git commit -m "squash history $(date -u +%Y-%m-%d)"
+  git branch -D main && git branch -m main && git push -f origin main
+  ```
+
+  Nothing is lost that matters — Gmail is the source of truth and the database
+  rebuilds from it.
