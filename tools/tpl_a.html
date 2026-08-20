@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="referrer" content="no-referrer">
+<title>Athens City Hotel — Performance</title>
+<style>
+:root{
+  color-scheme: light;
+  --plane:#f9f9f7; --surface:#fcfcfb;
+  --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,0.10);
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100;
+  --s5:#e87ba4; --s6:#008300; --s7:#4a3aa7; --s8:#e34948;
+  --good:#006300; --bad:#d03b3b; --warn:#fab219;
+  --chip:#ffffff; --chip-hover:#f1f0ec; --chip-on:#0b0b0b; --chip-on-ink:#ffffff;
+  --seq1:#cde2fb;--seq2:#b7d3f6;--seq3:#9ec5f4;--seq4:#86b6ef;--seq5:#6da7ec;
+  --seq6:#5598e7;--seq7:#3987e5;--seq8:#2a78d6;--seq9:#256abf;--seq10:#1c5cab;--seq11:#184f95;
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --plane:#0d0d0d; --surface:#1a1a19;
+  --ink:#ffffff; --ink2:#c3c2b7; --muted:#898781;
+  --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,0.10);
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+  --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767;
+  --good:#0ca30c; --bad:#d03b3b; --warn:#fab219;
+  --chip:#232322; --chip-hover:#2e2e2c; --chip-on:#ffffff; --chip-on-ink:#0b0b0b;
+  --seq1:#0d366b;--seq2:#104281;--seq3:#184f95;--seq4:#1c5cab;--seq5:#256abf;
+  --seq6:#2a78d6;--seq7:#3987e5;--seq8:#5598e7;--seq9:#6da7ec;--seq10:#86b6ef;--seq11:#9ec5f4;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--plane); color:var(--ink);
+  font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1360px;margin:0 auto;padding:22px 20px 80px}
+
+/* ---------- header ---------- */
+header.top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.brand h1{font-size:20px;font-weight:650;margin:0;letter-spacing:-0.01em}
+.brand p{margin:3px 0 0;color:var(--ink2);font-size:13px}
+.toolbtns{display:flex;gap:8px;align-items:center}
+
+/* ---------- controls ---------- */
+.filterbar{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:12px 14px;margin-bottom:16px;
+  display:flex;gap:18px;align-items:flex-end;flex-wrap:wrap;
+}
+.fgroup{display:flex;flex-direction:column;gap:6px}
+.fgroup>span.lab{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+.chips{display:flex;gap:4px;flex-wrap:wrap}
+.chip{
+  appearance:none;border:1px solid var(--border);background:var(--chip);color:var(--ink2);
+  font:inherit;font-size:12.5px;padding:5px 10px;border-radius:7px;cursor:pointer;white-space:nowrap;
+}
+.chip:hover{background:var(--chip-hover)}
+.chip[aria-pressed="true"]{background:var(--chip-on);color:var(--chip-on-ink);border-color:var(--chip-on);font-weight:600}
+.chip:focus-visible{outline:2px solid var(--s1);outline-offset:1px}
+input[type=date],select{
+  font:inherit;font-size:12.5px;padding:5px 8px;border-radius:7px;
+  border:1px solid var(--border);background:var(--chip);color:var(--ink);
+}
+.daterow{display:flex;gap:6px;align-items:center;color:var(--muted);font-size:12.5px}
+.note{
+  display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--ink2);
+  background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--warn);
+  border-radius:8px;padding:9px 12px;margin-bottom:16px;
+}
+.note b{color:var(--ink)}
+.note.hide{display:none}
+
+/* ---------- kpi ---------- */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+@media(max-width:1000px){.kpis{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.kpis{grid-template-columns:repeat(2,1fr);gap:8px}
+.kpi .val{font-size:22px}
+.kpi .spark{display:none}}
+@media(max-width:340px){.kpis{grid-template-columns:1fr}}
+.kpi{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px 14px 10px;
+  position:relative;overflow:hidden;
+}
+.kpi .lab{font-size:11.5px;color:var(--ink2);font-weight:550;letter-spacing:.01em}
+.kpi .val{font-size:28px;font-weight:650;letter-spacing:-0.02em;margin:4px 0 2px;line-height:1.1}
+.kpi .sub{font-size:11.5px;color:var(--muted)}
+.kpi .delta{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;margin-left:0}
+.kpi .delta.up{color:var(--good)} .kpi .delta.down{color:var(--bad)} .kpi .delta.flat{color:var(--muted)}
+.kpi .spark{position:absolute;right:10px;top:10px;opacity:.9}
+.kpi.hero .val{font-size:40px}
+
+/* ---------- cards ---------- */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+@media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr}}
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:14px 16px 12px;margin-bottom:14px;
+}
+.card>h2{font-size:14.5px;font-weight:640;margin:0 0 2px}
+.card>p.sub{font-size:12.5px;color:var(--ink2);margin:0 0 10px}
+.cardhead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.cardhead h2{margin:0;font-size:14.5px;font-weight:640}
+.cardhead p.sub{margin:2px 0 0;font-size:12.5px;color:var(--ink2)}
+.sechead{display:flex;align-items:baseline;gap:10px;margin:26px 0 12px;flex-wrap:wrap}
+.sechead h2{font-size:16px;font-weight:650;margin:0;letter-spacing:-0.01em}
+.sechead p{margin:0;font-size:12.5px;color:var(--muted)}
+
+/* ---------- legend ---------- */
+.legend{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin:2px 0 8px}
+.lg{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink2);cursor:default}
+.lg .swatch{width:11px;height:11px;border-radius:3px;flex:none}
+.lg .linekey{width:14px;height:2px;border-radius:2px;flex:none}
+.lg.off{opacity:.35}
+
+/* ---------- svg chart ---------- */
+.chartbox{position:relative;width:100%}
+svg.chart{display:block;width:100%;overflow:visible}
+svg .gridline{stroke:var(--grid);stroke-width:1;shape-rendering:crispEdges}
+svg .axisline{stroke:var(--axis);stroke-width:1;shape-rendering:crispEdges}
+svg .tick{fill:var(--muted);font-size:10.5px;font-variant-numeric:tabular-nums}
+svg .axlab{fill:var(--muted);font-size:10.5px}
+svg .dlabel{fill:var(--ink);font-size:11px;font-weight:600}
+svg .crosshair{stroke:var(--axis);stroke-width:1;pointer-events:none}
+svg .hit{fill:transparent;cursor:crosshair}
+svg .mark:hover{filter:brightness(1.12)}
+
+.tip{
+  position:absolute;pointer-events:none;z-index:20;min-width:130px;visibility:hidden;left:-9999px;top:-9999px;
+  background:var(--surface);border:1px solid var(--border);border-radius:9px;
+  box-shadow:0 6px 22px rgba(0,0,0,.13);padding:8px 10px;font-size:12px;
+  opacity:0;transition:opacity .09s;
+}
+.tip.on{opacity:1;visibility:visible}
+.tip .tt{font-size:11.5px;color:var(--ink2);font-weight:600;margin-bottom:5px}
+.tip table{border-collapse:collapse;width:100%}
+.tip td{padding:1px 0;vertical-align:middle}
+.tip td.k{padding-right:8px}
+.tip td.n{text-align:right;font-weight:650;font-variant-numeric:tabular-nums;color:var(--ink)}
+.tip td.s{color:var(--ink2);padding-left:6px}
+.tip .lk{display:inline-block;width:12px;height:2px;border-radius:2px;vertical-align:middle}
+
+/* ---------- tables ---------- */
+.tbtn{
+  appearance:none;background:none;border:none;color:var(--muted);font:inherit;font-size:11.5px;
+  cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:2px;
+}
+.tbtn:hover{color:var(--ink)}
+.tblwrap{display:none;margin-top:10px;max-height:320px;overflow:auto;border:1px solid var(--border);border-radius:8px}
+.tblwrap.on{display:block}
+table.data{border-collapse:collapse;width:100%;font-size:12px}
+table.data th,table.data td{padding:5px 9px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--grid)}
+table.data th{position:sticky;top:0;background:var(--surface);color:var(--ink2);font-weight:600;text-align:right;z-index:1}
+table.data th:first-child,table.data td:first-child{text-align:left}
+table.data td{font-variant-numeric:tabular-nums;color:var(--ink)}
+table.data tr:last-child td{border-bottom:none}
+
+footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--border);color:var(--muted);font-size:12px}
+footer code{background:var(--chip);padding:1px 5px;border-radius:4px;border:1px solid var(--border)}
+.sronly{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="brand">
+    <h1>Athens City Hotel</h1>
+    <p id="subtitle">Performance dashboard</p>
+  </div>
+  <div class="toolbtns">
+    <button class="chip" id="themeBtn" type="button">Dark mode</button>
+  </div>
+</header>
+
+<div class="filterbar">
+  <div class="fgroup">
+    <span class="lab">Period</span>
+    <div class="chips" id="presetChips"></div>
+  </div>
+  <div class="fgroup">
+    <span class="lab">Custom range</span>
+    <div class="daterow">
+      <input type="date" id="dFrom"> <span>to</span> <input type="date" id="dTo">
+    </div>
+  </div>
+  <div class="fgroup">
+    <span class="lab">Compare with</span>
+    <div class="chips" id="cmpChips"></div>
+  </div>
+  <div class="fgroup">
+    <span class="lab">Granularity</span>
+    <div class="chips" id="granChips"></div>
+  </div>
+</div>
+
+<div class="note hide" id="dataNote"></div>
+
+<div class="kpis" id="kpis"></div>
+
+<div class="card">
+  <div class="cardhead">
+    <div>
+      <h2>Trend</h2>
+      <p class="sub" id="trendSub"></p>
+    </div>
+    <div class="chips" id="metricChips"></div>
+  </div>
+  <div class="legend" id="trendLegend"></div>
+  <div class="chartbox"><svg class="chart" id="trendChart"></svg><div class="tip" id="trendTip"></div></div>
+  <button class="tbtn" data-table="trendTable">Show table</button>
+  <div class="tblwrap" id="trendTable"></div>
+</div>
+
+<div class="grid2">
+  <div class="card">
+    <h2>Revenue composition</h2>
+    <p class="sub">Accommodation, food &amp; beverage and other income</p>
+    <div class="legend" id="revLegend"></div>
+    <div class="chartbox"><svg class="chart" id="revChart"></svg><div class="tip" id="revTip"></div></div>
+    <button class="tbtn" data-table="revTable">Show table</button>
+    <div class="tblwrap" id="revTable"></div>
+  </div>
+  <div class="card">
+    <h2>Day of week</h2>
+    <p class="sub" id="dowSub">Average by weekday over the selected period</p>
+    <div class="legend" id="dowLegend"></div>
+    <div class="chartbox"><svg class="chart" id="dowChart"></svg><div class="tip" id="dowTip"></div></div>
+    <button class="tbtn" data-table="dowTable">Show table</button>
+    <div class="tblwrap" id="dowTable"></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="cardhead">
+    <div>
+      <h2>Month by month</h2>
+      <p class="sub">Every month on record — darker means higher. Independent of the period filter.</p>
+    </div>
+    <div class="chips" id="heatChips"></div>
+  </div>
+  <div class="chartbox"><svg class="chart" id="heatChart"></svg><div class="tip" id="heatTip"></div></div>
+  <button class="tbtn" data-table="heatTable">Show table</button>
+  <div class="tblwrap" id="heatTable"></div>
+</div>
+
+<div class="sechead">
+  <h2>Forward pace</h2>
+  <p>From the booking plan of <span id="paceDate"></span> — not affected by the period filter</p>
+</div>
+
+<div class="card">
+  <div class="cardhead">
+    <div>
+      <h2>On the books</h2>
+      <p class="sub">Rooms sold per night for the coming period, against what was actually achieved on the same dates a year ago</p>
+    </div>
+  </div>
+  <div class="legend" id="paceLegend"></div>
+  <div class="chartbox"><svg class="chart" id="paceChart"></svg><div class="tip" id="paceTip"></div></div>
+  <button class="tbtn" data-table="paceTable">Show table</button>
+  <div class="tblwrap" id="paceTable"></div>
+</div>
+
+<div class="grid2">
+  <div class="card">
+    <div class="cardhead">
+      <div>
+        <h2>Pickup</h2>
+        <p class="sub">Rooms added per arrival week since an earlier snapshot</p>
+      </div>
+      <div class="chips" id="pickupChips"></div>
+    </div>
+    <div class="chartbox"><svg class="chart" id="pickupChart"></svg><div class="tip" id="pickupTip"></div></div>
+    <button class="tbtn" data-table="pickupTable">Show table</button>
+    <div class="tblwrap" id="pickupTable"></div>
+  </div>
+  <div class="card">
+    <h2>Booking curve</h2>
+    <p class="sub">How occupancy builds as a stay date approaches — median across arrival dates</p>
+    <div class="legend" id="curveLegend"></div>
+    <div class="chartbox"><svg class="chart" id="curveChart"></svg><div class="tip" id="curveTip"></div></div>
+    <button class="tbtn" data-table="curveTable">Show table</button>
+    <div class="tblwrap" id="curveTable"></div>
+  </div>
+</div>
+
+<div class="sechead">
+  <h2>Bookings &amp; channel mix</h2>
+  <p>New reservations created in the selected period</p>
+</div>
+
+<div class="filterbar">
+  <div class="fgroup">
+    <span class="lab">Measure</span>
+    <div class="chips" id="prodMetricChips"></div>
+  </div>
+  <div class="fgroup"><span class="lab">Channel</span><select id="fSource"></select></div>
+  <div class="fgroup"><span class="lab">Room type</span><select id="fRoom"></select></div>
+  <div class="fgroup"><span class="lab">Country</span><select id="fCountry"></select></div>
+  <div class="fgroup"><span class="lab">Status</span><select id="fStatus"></select></div>
+  <div class="fgroup"><span class="lab">&nbsp;</span><button class="chip" id="prodReset" type="button">Reset filters</button></div>
+</div>
+
+<div class="kpis" id="prodKpis"></div>
+
+<div class="card">
+  <div class="cardhead">
+    <div>
+      <h2>Production over time</h2>
+      <p class="sub" id="prodTrendSub">New bookings by channel, by the date the booking was made</p>
+    </div>
+  </div>
+  <div class="legend" id="prodTrendLegend"></div>
+  <div class="chartbox"><svg class="chart" id="prodTrendChart"></svg><div class="tip" id="prodTrendTip"></div></div>
+  <button class="tbtn" data-table="prodTrendTable">Show table</button>
+  <div class="tblwrap" id="prodTrendTable"></div>
+</div>
+
+<div class="grid2">
+  <div class="card">
+    <h2>Channel</h2>
+    <p class="sub" id="chanSub"></p>
+    <div class="chartbox"><svg class="chart" id="chanChart"></svg><div class="tip" id="chanTip"></div></div>
+    <button class="tbtn" data-table="chanTable">Show table</button>
+    <div class="tblwrap" id="chanTable"></div>
+  </div>
+  <div class="card">
+    <h2>Guest country</h2>
+    <p class="sub" id="cntrySub"></p>
+    <div class="chartbox"><svg class="chart" id="cntryChart"></svg><div class="tip" id="cntryTip"></div></div>
+    <button class="tbtn" data-table="cntryTable">Show table</button>
+    <div class="tblwrap" id="cntryTable"></div>
+  </div>
+</div>
+
+<div class="grid2">
+  <div class="card">
+    <h2>Room type</h2>
+    <p class="sub" id="rtSub"></p>
+    <div class="chartbox"><svg class="chart" id="rtChart"></svg><div class="tip" id="rtTip"></div></div>
+    <button class="tbtn" data-table="rtTable">Show table</button>
+    <div class="tblwrap" id="rtTable"></div>
+  </div>
+  <div class="card">
+    <h2>Booking lead time</h2>
+    <p class="sub">Days between booking and arrival</p>
+    <div class="chartbox"><svg class="chart" id="leadChart"></svg><div class="tip" id="leadTip"></div></div>
+    <button class="tbtn" data-table="leadTable">Show table</button>
+    <div class="tblwrap" id="leadTable"></div>
+  </div>
+</div>
+
+<footer id="foot"></footer>
+</div>
